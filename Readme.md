@@ -128,10 +128,8 @@ Below is the database schema that models the relationships between users, playli
 
 ## Future Enhancements
 - Integrate real song streaming functionality.
-- Add user authentication (sign up, login, and logout).
 - Allow playlist collaboration between multiple users.
 - Implement API integration for real-time song data.
-
 ---
 
 ## Credits  

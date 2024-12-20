@@ -19,6 +19,7 @@ def connect_db(app):
     with app.app_context():
         db.app = app
         db.init_app(app)
+        db.create_all()
 
 
 class PlaylistSong(db.Model):
@@ -130,12 +131,16 @@ class User(db.Model):
         }
         data = {"grant_type": "client_credentials"}
 
-        result = post(url, headers=headers, data= data)
+        result = post(url, headers=headers, data=data)
+        result.raise_for_status() 
+        
+        json_result = result.json()
+        token = json_result.get("access_token")
 
-        json_result = json.loads(result.content)
-    
-        token = json_result['access_token']
+        if not token:
+            raise ValueError("Access token not found in response.")
         return token
+        
 
     @staticmethod
     def get_auth_header(token):
@@ -160,6 +165,7 @@ class User(db.Model):
         )
 
         db.session.add(user)
+        db.session.commit()
         return user
 
     @classmethod
@@ -168,11 +174,8 @@ class User(db.Model):
 
         user = cls.query.filter_by(username=username).first()
 
-        if user:
-            is_auth = bcrypt.check_password_hash(user.password, password)
-            if is_auth:
-                return user
-
+        if user and bcrypt.check_password_hash(user.password, password):
+            return user
         return False
     
 class Song(db.Model):

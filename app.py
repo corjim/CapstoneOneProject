@@ -20,9 +20,14 @@ app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', "No secret is actually a
 
 app.app_context().push()
 connect_db(app)
+def connect_db(app):
+    with app.app_context():
+        db.app = app
+        db.init_app(app)
+        db.create_all()
 
-# db.drop_all()
-# db.create_all()
+db.drop_all()
+db.create_all()
 
 CURR_USER_KEY = "curr_user" 
 
@@ -167,7 +172,7 @@ def like_playlist(playlist_id):
 
      if not g.user:
          flash("Not Allowed", "danger")
-         return redirect(url_for("homepsge"))
+         return redirect(url_for("homepage"))
      
      liked_playlist = Playlist.query.get_or_404(playlist_id)
 
@@ -214,6 +219,7 @@ def search_artist():
     if not artist_name:
         return flash("Access unauthorized: Please log add songs.", "danger")
     
+
     token = User.get_token()
     headers = User.get_auth_header(token)
     url = "https://api.spotify.com/v1/search"
