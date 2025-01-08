@@ -30,9 +30,14 @@ body {
 }
 
 .navbar a {
-    color: #e8edf2;
+    color: #111417;
     font-size: 30px;
     font-weight: bold;
+    text-shadow: 0px 5px 5px #fff;
+}
+
+.logOut {
+    font-size: 15px;
 }
 
 .navbar a:hover {
@@ -72,21 +77,26 @@ nav form.navbar-form {
 }
 
 #search.form-control {
-    border-radius: 20px;
+    position: relative;
+    display: inline;
+    border-radius: 10px;
     margin-bottom: 0;
-    width: 100%;
-    font-size: 25px;
-    padding-right: 28px;
+    width: 55%;
+    font-size: 20px;
+    font-weight: bold;
+    left: 250px;
+
+    padding-right: 80px;
     box-sizing: border-box;
 }
 
 #search.form-control+.btn {
-    position: absolute;
-    right: 30px;
-    top: 12px;
-    bottom: 4px;
+    position: relative;
+    left: 200px;
+    bottom: 6px;
     z-index: 1;
-    font-size: 25px;
+    font-size: 20px;
+    display: inline;
     padding: 2px;
     color: #343232;
 }
@@ -140,7 +150,6 @@ nav form.navbar-form {
 nav+.container {
     margin-bottom: 1rem;
 }
-
 
 .full-width {
     width: 100vw;
@@ -219,6 +228,7 @@ nav+.container {
     padding: 12px;
 }
 
+
 /* Platify detail html */
 /* Detail header */
 #detail-head {
@@ -252,56 +262,241 @@ nav+.container {
 
 #aside-home {
     font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-weight: bold;
     text-shadow: 1px 0px #333;
 }
 
-/* Background styling  artist-tracks.htm*/
+/* Song sections styling */
+
+#songs-container {
+    background-color: #333;
+}
+
+#no-song-display {
+    color: rgb(172, 172, 165);
+    font-weight: bold;
+}
+
+
+*/ #headline-div {
+    font-weight: bold;
+    background-color: rgba(27, 17, 17, 0.935);
+    border-radius: 5px;
+    color: rgb(230, 237, 6);
+}
+
+#song-details {
+    background-color: rgba(22, 24, 22, 0.863);
+    transition: transform 0.2s ease;
+}
+
+#song-details:hover {
+    transition: scale(1.1);
+}
+
+#song-info h5 {
+    color: beige;
+
+}
+
+#song-info .song-artist {
+    color: rgb(201, 201, 191);
+}
+
+/* Background styling Top Artist-tracks.*/
 .artist-background {
-    position: fixed;
     top: 0;
     left: 0;
     width: 100%;
-    height: 100%;
-    background-image: url('{{ artist.images[0]["url"] if artist.images else "" }}');
+    height: 90vh;
+    position: sticky;
     background-size: cover;
-    background-repeat: no-repeat;
     background-attachment: fixed;
     z-index: -1;
-    filter: brightness(0.5);
+    filter: brightness(0.9);
 }
 
-/* Content container */
-.content-container {
-    position: relative;
-    z-index: 1;
+/* Artist top track background */
+#artist-top-tracks-bg {
+    background-color: rgba(14, 14, 14, 0.81);
+    margin: 30px;
+    border-radius: 10px;
+    box-shadow: 2px 3px 3px rgba(30, 9, 9, 0.751);
 }
 
-/* STYLES FOR ALBUM SECTION */
-#album-body {
-    background-image: url("{{ album.image | safe }}");
+/* content for top track artist name, genre, followers */
+.overlay {
+    color: beige;
+    width: 35%;
+    margin-left: 40%;
+    margin-top: 90px;
+    font-weight: bold;
+    background-color: rgb(22, 24, 22);
+    border-radius: 20px;
+}
+
+#toggle-tracks {
+    background-color: rgba(81, 56, 56, 0.313);
+    color: beige;
+
+}
+
+#track-headline {
+    background-color: rgb(22, 24, 22);
+    color: beige;
+    font-weight: bold;
+    font-size: 60px;
+}
+
+#artist-top-tracks {
+    color: beige;
+    background-color: rgb(22, 24, 22);
+    border-radius: 10px;
+    box-shadow: 0px 4px 5px rgba(81, 56, 56, 0.313);
+    transition: transform 0.5s ease;
+}
+
+#artist-top-tracks:hover {
+    transform: scale(1.1);
+    background-color: #010e0c;
+    box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.2);
+}
+
+#artist-top-tracks #att-btn {
+    background-color: rgba(65, 65, 7, 0.674);
+    color: beige;
+}
+
+#artist-top-tracks #att-btn:hover {
+    background-color: beige;
+    color: #333;
+
+}
+
+/* Styles for the album page */
+
+/* Album List headline */
+#track-album-headline {
+    background-color: rgb(22, 24, 22);
+    font-weight: bold;
+    color: beige;
+    margin: 30px;
+    border-radius: 10px;
+}
+
+/* Album List Style */
+#track-album-background {
+    margin: 20px;
+    background-color: #1b111172;
+}
+
+#track-album-content {
+    color: beige;
+    border-radius: 5px;
+    transition: transform 0.3s ease;
+}
+
+#track-album-content:hover {
+    transform: scale(1.1);
+    background-color: #010e0c;
+    box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.2);
+}
+
+#track-album-items {
+    font-weight: bold;
+    color: beige;
+    background-color: rgb(34, 31, 31);
+}
+
+#track-album-content #att-btn {
+    color: beige;
+    background-color: rgb(22, 24, 22);
+}
+
+#track-album-content #att-btn:hover {
+    background-color: beige;
+    color: #333;
+    font-weight: bold;
+}
+
+/* End of Top Artist Tracks */
+
+/* STYLES FOR ALBUM SECTION/PAGE */
+.album-background {
+    border-radius: 10px;
+    box-shadow: 5px 5px 3px solid white;
+    margin-right: 15px;
+    width: 100vw;
+    height: 100vh;
+    position: sticky;
+    top: 0;
     background-size: cover;
     background-position: center;
     background-attachment: fixed;
+    filter: brightness(0.8);
+    overflow: hidden;
+
 }
 
 .album_overlay {
-    background: rgba(0, 0, 0, 0.7);
+    background-color: rgba(22, 24, 22, 0.34);
+    color: beige;
+    height: 450px;
     padding: 20px;
     border-radius: 10px;
 }
 
-.card {
-    background: rgba(255, 255, 255, 0.1);
-    border: none;
+#overlay-headline {
+    border-radius: 12px;
+    font-weight: bold;
+    color: beige;
+    text-shadow: 5px 2px #13131313;
+}
+
+.album_overlay .rd {
+    border-radius: 10px;
+    background-color: #010c1232;
+    font-size: 40px;
+    font-weight: bold;
+    color: rgba(255, 255, 255, 0.7);
+    text-shadow: 1px 2px #13131313;
 }
 
 .album-btn {
-    background: rgba(255, 255, 255, 0.3);
-    color: white;
-    border: 1px solid white;
+    background: rgba(50, 212, 193, 0.3);
+    font-size: 20px;
+    font-weight: bold;
+    color: beige;
+    border: 5px solid white;
 }
 
-.album-btn:hover {
+
+#view-track:hover {
     background: rgba(255, 255, 255, 0.5);
-    color: black;
+    color: rgb(19, 73, 58);
+}
+
+#album-tracks-bg {
+    background-color: #100f0fac;
+    font-size: 30px;
+    margin: 2px;
+    border-radius: 10px solid #333;
+    color: beige;
+}
+
+#album-tracks-bg:hover {
+    transform: scale(0.9);
+    background-color: #010e0c;
+    box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.2);
+
+}
+
+#album-tracks-btn {
+    color: rgb(12, 11, 11);
+    background-color: white;
+}
+
+#album-tracks-btn:hover {
+    background-color: rgb(65, 2, 2);
+    color: beige;
 }

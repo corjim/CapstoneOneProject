@@ -14,7 +14,7 @@
         integrity="sha256-kmHvs0B+OpCW5GVHUNjv9rOmY0IvSIRcf7zGUDTDQM8=" crossorigin="anonymous"></script>
 
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css">
-    <link rel="stylesheet" href="/static/stylesheets/styles.css">
+    <link rel="stylesheet" href="../static/stylesheets/styles.css">
     <link rel="shortcut icon" href="/static/favicon.ico">
 </head>
 
@@ -55,7 +55,7 @@
                         <img src="{{ g.user.image_url }}" alt="{{ g.user.username }}">
                     </a>
                 </li>
-                <li><a href="/logout">Log out</a></li>
+                <li class="logOut"><a href="/logout">Log out</a></li>
                 {% endif %}
             </ul>
         </div>
@@ -95,6 +95,6 @@
 </body>
 
 <script src="/static/app.js"></script>
-<script src="https://sdk.scdn.co/spotify-player.js"></script>
+<!-- <script src="https://sdk.scdn.co/spotify-player.js"></script> -->
 
 </html>

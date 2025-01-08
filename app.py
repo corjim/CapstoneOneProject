@@ -1,13 +1,12 @@
 import os
 from requests import post, get
 from flask import Flask, render_template, request, json, flash, redirect, session, g, url_for,abort, jsonify
-from bs4 import BeautifulSoup
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.exc import IntegrityError
 from models import db, connect_db, User, Playlist, Song ,UserSongs, PlaylistSong, Likes
 from forms import AddUserForm, LoginForm, CreatePlaylistForm, NewSongForPlaylistForm
 
-
+from helper_function import fetch_album_tracks, fetch_artist_albums, fetch_artist_info, fetch_artist_top_tracks
 app = Flask(__name__)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = (
@@ -26,8 +25,8 @@ def connect_db(app):
         db.init_app(app)
         db.create_all()
 
-db.drop_all()
-db.create_all()
+# db.drop_all()
+# db.create_all()
 
 CURR_USER_KEY = "curr_user" 
 
@@ -148,7 +147,6 @@ def users_show(user_id):
     # Get all the user's favorite songs to display
     fav_songs = user.fav_songs if user else []
 
-    # likes = [message.id for message in user.likes]
     return render_template('users/show.html', user=user, playlists=playlists,songs=songs, fav_songs=fav_songs)
 
 
@@ -207,111 +205,77 @@ def delete_user():
    
 
 # ########################################
-# Artist and album routes
-@app.route('/search')
+
+@app.route("/search")
 def search_artist():
+    # Ensure user is authenticated
     if not g.user:
         flash("Access unauthorized.", "danger")
         return redirect("/")
-    
-    # Fallback artist for homepage
-    artist_name = request.args.get('artist')  
+
+    # Retrieve artist name or return error
+    artist_name = request.args.get('artist')
     if not artist_name:
-        return flash("Access unauthorized: Please log add songs.", "danger")
-    
+        flash("Access unauthorized: Please log in to add songs.", "danger")
+        return redirect("/")
 
-    token = User.get_token()
-    headers = User.get_auth_header(token)
-    url = "https://api.spotify.com/v1/search"
-    query_params = {'q': artist_name, 'type': 'artist', 'limit': 1}
+    try:
+        # Get token and headers
+        token = User.get_token()
+        headers = User.get_auth_header(token)
 
-    result = get(url, headers=headers, params=query_params)
-    json_result = json.loads(result.content).get('artists', {}).get('items', [])
+        # Fetch artist information
+        artist_info = fetch_artist_info(artist_name, headers)
+        if not artist_info:
+            return {"error": f"No artist found for {artist_name}"}
 
-    if not json_result:
-        return {"error": f"No artist found for {artist_name}"}
+        artist_id = artist_info['id']
 
-    artist_info = json_result[0]
-    artist_id = artist_info['id']
-    artist_followers = artist_info['followers'].get('total')
-    artist_genre = artist_info['genres']
+        # Fetch albums and tracks
+        albums_info = fetch_artist_albums(artist_id, headers)
+        if not albums_info:
+            return {"error": f"No album found for artist {artist_name}"}
 
-    # Get the artist's top album
-    album_url = f"https://api.spotify.com/v1/artists/{artist_id}/albums"
-    album_params = {'market': 'US', "limit": 10 }
-    album_result = get(album_url, headers=headers, params=album_params)
-    albums_json = json.loads(album_result.content).get('items')
-    albums_info = albums_json
-    
-    if not albums_json:
-        return {"error": f"No album found for artist {artist_name}"}
-    
-    albums_info = []
-    for album in albums_json:
-        album_name = album.get('name')
-        album_id = album.get('id')
-        release_date = album.get('release_date')
-        total_tracks = album.get('total_tracks')
-        album_url = album.get('images')[0]['url']
+        top_tracks = fetch_artist_top_tracks(artist_id, headers)
+        if not top_tracks:
+            return {"error": f"No tracks found for artist {artist_name}"}
 
-        # Fetch track details for each album
-        tracks_url = f"https://api.spotify.com/v1/albums/{album['id']}/tracks"
-        tracks_result = get(tracks_url, headers=headers)
-        tracks_json = json.loads(tracks_result.content).get('items')
-        track_names = [track.get('name') for track in tracks_json]
-
-        # Append album info
-        albums_info.append({
-        'album_name': album_name,
-        'id': album_id,
-        'image': album_url,
-        'release_date': release_date,
-        'total_tracks': total_tracks,
-        'tracks': track_names
-        })
-    
-    # Get the artist's top track
-    tracks_url = f"https://api.spotify.com/v1/artists/{artist_id}/top-tracks"
-    tracks_params = {'market': 'US'}
-    tracks_result = get(tracks_url, headers=headers, params=tracks_params)
-    tracks_json = json.loads(tracks_result.content).get('tracks', [])
-
-    if not tracks_json:
-        return {"error": f"No tracks found for artist {artist_name}"}
-
-    song_name = tracks_json
-    resp ={
+        # Build response
+        response = {
             "artist": {
                 "id": artist_id,
                 "name": artist_info['name'],
-                "images": artist_info['images'],
-                "followers": artist_followers,
-                "genres": artist_genre,
-                "popularity": artist_info['popularity'],
-                "url_link" : artist_info['uri']
+                "images": artist_info.get('images', [])[0],
+                "followers": artist_info['followers'].get('total'),
+                "genres": artist_info.get('genres', []),
+                "popularity": artist_info.get('popularity'),
+                "url_link": artist_info.get('uri'),
             },
-            "track": {
-                "name": song_name,
-            },
-            "album": {
-                "name" : albums_info  
-            }
+            "track": {"name": top_tracks},
+            "album": {"info": albums_info},
         }
-    return (resp)
+
+        return response
+
+    except Exception as e:
+        # Log error (optional) and return a generic error response
+        return {"error": f"An error occurred: {str(e)}"}
+
 
 # Get artist top tracks
 @app.route('/artist_top_tracks')
 def artist_top_tracks():
-
+    
     if not g.user:
         flash("Access unauthorized please log in get artists.", "danger")
         return redirect("/")
 
     artist_data = search_artist()
+
     artist = artist_data.get('artist')
     tracks  = artist_data.get('track')
     albums_result = artist_data.get("album")
-    albums = albums_result["name"]
+    albums = albums_result["info"]
 
     return render_template('artists/tracks.html', artist=artist, tracks=tracks, albums=albums, user=g.user)
 
@@ -322,11 +286,12 @@ def add_song():
     if not g.user:
         flash("Access unauthorized: Please log in to add songs.", "danger")
         return redirect("/")
-
+        
     user = g.user
 
     # Extract track and artist details via form request
     track_name = request.form.get('track_name')
+    
     artist_name = request.form.get('artist_name')
     track_duration = request.form.get('track_duration')
     track_popularity = request.form.get('track_popularity')
@@ -355,6 +320,7 @@ def add_song():
         
         db.session.add(song)
         db.session.commit()
+        print("YYYYYYYY", song)
     else:
         song = existing_song
 
@@ -545,7 +511,7 @@ def add_song_to_playlist(playlist_id):
 # Delete  Platifylist
 @app.route("/playlists/<int:playlist_id>/delete", methods=["POST"])
 def delete_playtifylist(playlist_id):
-    """ Deletes Playtifylist"""
+    """ Delete Playtifylist"""
 
     if not g.user:
         flash("Access unauthorized.", "danger")
