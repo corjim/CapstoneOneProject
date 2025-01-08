@@ -1,6 +1,7 @@
 # Playtify 🎵  
 A playlist management web application where users can create playlists, add their favorite songs, preview the sound of the song, and interact with others by liking playlists. Playtify aims to mimic the core functionalities of music platforms, enabling seamless organization and display of songs and playlists. Users can view other user's profile to see the list of their playlist and the songs they have under their radar, user can also keep tracks of other user's playlists through the like.
 
+https://playtify-song-app.onrender.com
 ---
 
 ## Table of Contents
@@ -133,4 +134,4 @@ Below is the database schema that models the relationships between users, playli
 ---
 
 ## Credits  
-Developed by: [corjim]  
+Developed by: github- corjim

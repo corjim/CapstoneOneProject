@@ -17,7 +17,7 @@ app.config['SQLALCHEMY_ECHO'] = False
 app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = True
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', "No secret is actually a secret")
 
-app.app_context().push()
+# app.app_context().push()
 connect_db(app)
 def connect_db(app):
     with app.app_context():
